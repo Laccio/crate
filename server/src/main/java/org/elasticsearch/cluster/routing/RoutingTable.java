@@ -35,6 +35,7 @@ import org.elasticsearch.cluster.Diffable;
 import org.elasticsearch.cluster.DiffableUtils;
 import org.elasticsearch.cluster.metadata.IndexMetadata;
 import org.elasticsearch.cluster.metadata.Metadata;
+import org.elasticsearch.cluster.node.DiscoveryNodes;
 import org.elasticsearch.cluster.routing.RecoverySource.SnapshotRecoverySource;
 import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.io.stream.StreamInput;
@@ -57,7 +58,7 @@ import io.crate.common.collections.Iterables;
  *
  * @see IndexRoutingTable
  */
-public class RoutingTable implements Iterable<IndexRoutingTable>, Diffable<RoutingTable> {
+public class RoutingTable implements Iterable<IndexRoutingTable>, Diffable<RoutingTable>, RoutingDataProvider {
 
     public static final RoutingTable EMPTY_ROUTING_TABLE = builder().build();
 
@@ -600,4 +601,14 @@ public class RoutingTable implements Iterable<IndexRoutingTable>, Diffable<Routi
         return sb.toString();
     }
 
+    @Override
+    public RoutingTable routingTable() {
+        return this;
+    }
+
+    @Override
+    public DiscoveryNodes discoveryNodes() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getDiscoveryNodes'");
+    }
 }

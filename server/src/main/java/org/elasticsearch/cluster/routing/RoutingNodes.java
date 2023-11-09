@@ -40,7 +40,6 @@ import org.jetbrains.annotations.Nullable;
 import org.apache.logging.log4j.Logger;
 import org.apache.lucene.util.CollectionUtil;
 import org.elasticsearch.Assertions;
-import org.elasticsearch.cluster.ClusterState;
 import org.elasticsearch.cluster.metadata.IndexMetadata;
 import org.elasticsearch.cluster.metadata.Metadata;
 import org.elasticsearch.cluster.node.DiscoveryNode;
@@ -86,24 +85,26 @@ public class RoutingNodes implements Iterable<RoutingNode> {
 
     private final Map<String, ObjectIntHashMap<String>> nodesPerAttributeNames = new HashMap<>();
     private final Map<String, Recoveries> recoveriesPerNode = new HashMap<>();
+    //NOCD ID:1
+    private RoutingDataProvider routingDataProvider;
 
-    public RoutingNodes(ClusterState clusterState) {
-        this(clusterState, true);
+    public RoutingNodes(RoutingDataProvider routingDataProvider) {
+        this(routingDataProvider, true);
     }
 
-    public RoutingNodes(ClusterState clusterState, boolean readOnly) {
+    public RoutingNodes(RoutingDataProvider routingDataProvider, boolean readOnly) {
         this.readOnly = readOnly;
-        final RoutingTable routingTable = clusterState.routingTable();
+        this.routingDataProvider = routingDataProvider;
 
         Map<String, LinkedHashMap<ShardId, ShardRouting>> nodesToShards = new HashMap<>();
         // fill in the nodeToShards with the "live" nodes
-        for (ObjectCursor<DiscoveryNode> cursor : clusterState.nodes().getDataNodes().values()) {
+        for (ObjectCursor<DiscoveryNode> cursor : routingDataProvider.discoveryNodes().getDataNodes().values()) {
             nodesToShards.put(cursor.value.getId(), new LinkedHashMap<>()); // LinkedHashMap to preserve order
         }
 
         // fill in the inverse of node -> shards allocated
         // also fill replicaSet information
-        for (ObjectCursor<IndexRoutingTable> indexRoutingTable : routingTable.indicesRouting().values()) {
+        for (ObjectCursor<IndexRoutingTable> indexRoutingTable : routingDataProvider.routingTable().indicesRouting().values()) {
             for (IndexShardRoutingTable indexShard : indexRoutingTable.value) {
                 assert indexShard.primary != null;
                 for (ShardRouting shard : indexShard) {
@@ -147,7 +148,7 @@ public class RoutingNodes implements Iterable<RoutingNode> {
         }
         for (Map.Entry<String, LinkedHashMap<ShardId, ShardRouting>> entry : nodesToShards.entrySet()) {
             String nodeId = entry.getKey();
-            this.nodesToShards.put(nodeId, new RoutingNode(nodeId, clusterState.nodes().get(nodeId), entry.getValue()));
+            this.nodesToShards.put(nodeId, new RoutingNode(nodeId, routingDataProvider.discoveryNodes().get(nodeId), entry.getValue()));
         }
     }
 

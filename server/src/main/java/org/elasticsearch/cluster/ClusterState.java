@@ -39,6 +39,7 @@ import org.elasticsearch.cluster.node.DiscoveryNode;
 import org.elasticsearch.cluster.node.DiscoveryNodes;
 import org.elasticsearch.cluster.routing.IndexRoutingTable;
 import org.elasticsearch.cluster.routing.IndexShardRoutingTable;
+import org.elasticsearch.cluster.routing.RoutingDataProvider;
 import org.elasticsearch.cluster.routing.RoutingNode;
 import org.elasticsearch.cluster.routing.RoutingNodes;
 import org.elasticsearch.cluster.routing.RoutingTable;
@@ -89,7 +90,7 @@ import io.crate.server.xcontent.XContentHelper;
  * throws the {@link IncompatibleClusterStateVersionException}, which causes the publishing mechanism to send
  * a full version of the cluster state to the node on which this exception was thrown.
  */
-public class ClusterState implements ToXContentFragment, Diffable<ClusterState> {
+public class ClusterState implements ToXContentFragment, Diffable<ClusterState>, RoutingDataProvider {
 
     public static final ClusterState EMPTY_STATE = builder(ClusterName.CLUSTER_NAME_SETTING.getDefault(Settings.EMPTY)).build();
 
@@ -177,10 +178,6 @@ public class ClusterState implements ToXContentFragment, Diffable<ClusterState> 
 
     public CoordinationMetadata coordinationMetadata() {
         return metadata.coordinationMetadata();
-    }
-
-    public RoutingTable routingTable() {
-        return routingTable;
     }
 
     public ClusterBlocks blocks() {
@@ -555,7 +552,7 @@ public class ClusterState implements ToXContentFragment, Diffable<ClusterState> 
         return new Builder(state);
     }
 
-    public static class Builder {
+    public static class Builder implements RoutingDataProvider {
 
         private final ClusterName clusterName;
         private long version = 0;
@@ -582,6 +579,16 @@ public class ClusterState implements ToXContentFragment, Diffable<ClusterState> 
         public Builder(ClusterName clusterName) {
             customs = ImmutableOpenMap.builder();
             this.clusterName = clusterName;
+        }
+        
+        @Override
+        public RoutingTable routingTable() {
+            return routingTable;
+        }
+
+        @Override
+        public DiscoveryNodes discoveryNodes() {
+            return nodes;
         }
 
         public Builder nodes(DiscoveryNodes.Builder nodesBuilder) {
@@ -808,4 +815,16 @@ public class ClusterState implements ToXContentFragment, Diffable<ClusterState> 
             return builder.build();
         }
     }
+
+    @Override
+    public RoutingTable routingTable() {
+        return routingTable;
+    }
+
+    @Override
+    public DiscoveryNodes discoveryNodes() {
+        return nodes;
+    }
+
+   
 }
