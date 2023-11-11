@@ -68,7 +68,7 @@ import org.elasticsearch.index.VersionType;
 import org.elasticsearch.index.engine.Engine;
 import org.elasticsearch.index.seqno.SequenceNumbers;
 import org.elasticsearch.index.shard.AbstractIndexShardComponent;
-import org.elasticsearch.index.shard.IndexShardComponent;
+//import org.elasticsearch.index.shard.IndexShardComponent;
 import org.elasticsearch.index.shard.ShardId;
 
 import io.crate.Constants;
@@ -96,7 +96,7 @@ import io.crate.common.io.IOUtils;
  * operation etc. are still preserved.
  * </p>
  */
-public class Translog extends AbstractIndexShardComponent implements IndexShardComponent, Closeable {
+public class Translog extends AbstractIndexShardComponent implements Closeable {
 
     /*
      * TODO
