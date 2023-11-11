@@ -56,9 +56,11 @@ public class VerifyNodeRepositoryAction {
 
     private final ClusterService clusterService;
 
-    private final RepositoriesService repositoriesService;
+    //private final RepositoriesService repositoriesService;
 
-    public VerifyNodeRepositoryAction(TransportService transportService, ClusterService clusterService, RepositoriesService repositoriesService) {
+    private final RepositoriesServiceInterface repositoriesService;
+
+    public VerifyNodeRepositoryAction(TransportService transportService, ClusterService clusterService, RepositoriesServiceInterface repositoriesService) {
         this.transportService = transportService;
         this.clusterService = clusterService;
         this.repositoriesService = repositoriesService;
@@ -76,7 +78,7 @@ public class VerifyNodeRepositoryAction {
             if (readOnly && node.getVersion().before(Version.V_4_2_0)) {
                 continue;
             }
-            if (RepositoriesService.isDedicatedVotingOnlyNode(node.getRoles()) == false) {
+            if (RepositoriesServiceInterface.iisDedicatedVotingOnlyNode(node.getRoles()) == false) {
                 nodes.add(node);
             }
         }
@@ -124,7 +126,7 @@ public class VerifyNodeRepositoryAction {
     }
 
     private void doVerify(String repositoryName, String verificationToken, DiscoveryNode localNode) {
-        Repository repository = repositoriesService.repository(repositoryName);
+        Repository repository = repositoriesService.get().repository(repositoryName);
         repository.verify(verificationToken, localNode);
     }
 

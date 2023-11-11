@@ -64,7 +64,7 @@ import io.crate.common.io.IOUtils;
 /**
  * Service responsible for maintaining and providing access to snapshot repositories on nodes.
  */
-public class RepositoriesService extends AbstractLifecycleComponent implements ClusterStateApplier {
+public class RepositoriesService extends AbstractLifecycleComponent implements ClusterStateApplier, RepositoriesServiceInterface {
 
     private static final Logger LOGGER = LogManager.getLogger(RepositoriesService.class);
 
@@ -287,6 +287,7 @@ public class RepositoriesService extends AbstractLifecycleComponent implements C
         return roles.contains(DiscoveryNodeRole.MASTER_ROLE) && roles.contains(DiscoveryNodeRole.DATA_ROLE) == false &&
             roles.stream().anyMatch(role -> role.roleName().equals("voting_only"));
     }
+    
 
     /**
      * Checks if new repositories appeared in or disappeared from cluster metadata and updates current list of
@@ -545,5 +546,10 @@ public class RepositoriesService extends AbstractLifecycleComponent implements C
     protected void doClose() throws IOException {
         clusterService.removeApplier(this);
         IOUtils.close(Lists2.concat(internalRepositories.values(), repositories.values()));
+    }
+
+    @Override
+    public RepositoriesService get() {
+        return this;
     }
 }
