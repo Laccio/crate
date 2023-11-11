@@ -31,7 +31,8 @@ import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.repositories.RepositoryOperation;
 import org.elasticsearch.snapshots.Snapshot;
 import org.elasticsearch.snapshots.SnapshotId;
-import org.elasticsearch.snapshots.SnapshotsService;
+//CD_ID:3
+//import org.elasticsearch.snapshots.SnapshotsService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,7 +53,8 @@ public class SnapshotDeletionsInProgress extends AbstractNamedDiffable<Custom> i
     public static final String TYPE = "snapshot_deletions";
     // the version where SnapshotDeletionsInProgress was introduced
     public static final Version VERSION_INTRODUCED = Version.V_3_0_1;
-
+    public static final Version MULTI_DELETE_VERSION = Version.V_5_1_0;
+    public static final Version FULL_CONCURRENCY_VERSION = Version.V_5_2_0;
     // the list of snapshot deletion request entries
     private final List<Entry> entries;
 
@@ -230,7 +232,7 @@ public class SnapshotDeletionsInProgress extends AbstractNamedDiffable<Custom> i
         }
 
         public Entry(StreamInput in) throws IOException {
-            if (in.getVersion().onOrAfter(SnapshotsService.MULTI_DELETE_VERSION)) {
+            if (in.getVersion().onOrAfter(MULTI_DELETE_VERSION)) {
                 this.repoName = in.readString();
                 this.snapshots = in.readList(SnapshotId::new);
             } else {
@@ -240,7 +242,7 @@ public class SnapshotDeletionsInProgress extends AbstractNamedDiffable<Custom> i
             }
             this.startTime = in.readVLong();
             this.repositoryStateId = in.readLong();
-            if (in.getVersion().onOrAfter(SnapshotsService.FULL_CONCURRENCY_VERSION)) {
+            if (in.getVersion().onOrAfter(FULL_CONCURRENCY_VERSION)) {
                 this.state = State.readFrom(in);
                 this.uuid = in.readString();
             } else {
@@ -314,9 +316,10 @@ public class SnapshotDeletionsInProgress extends AbstractNamedDiffable<Custom> i
             return Objects.hash(snapshots, repoName, startTime, repositoryStateId, state, uuid);
         }
 
+
         @Override
         public void writeTo(StreamOutput out) throws IOException {
-            if (out.getVersion().onOrAfter(SnapshotsService.MULTI_DELETE_VERSION)) {
+            if (out.getVersion().onOrAfter(MULTI_DELETE_VERSION)) {
                 out.writeString(repoName);
                 out.writeCollection(snapshots);
             } else {
@@ -326,7 +329,7 @@ public class SnapshotDeletionsInProgress extends AbstractNamedDiffable<Custom> i
             }
             out.writeVLong(startTime);
             out.writeLong(repositoryStateId);
-            if (out.getVersion().onOrAfter(SnapshotsService.FULL_CONCURRENCY_VERSION)) {
+            if (out.getVersion().onOrAfter(FULL_CONCURRENCY_VERSION)) {
                 state.writeTo(out);
                 out.writeString(uuid);
             }
