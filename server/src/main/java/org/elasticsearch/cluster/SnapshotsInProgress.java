@@ -43,9 +43,11 @@ import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.index.shard.ShardId;
 import org.elasticsearch.repositories.IndexId;
 import org.elasticsearch.repositories.RepositoryOperation;
+import org.elasticsearch.repositories.ShardGenerations;
 import org.elasticsearch.snapshots.InFlightShardSnapshotStates;
 import org.elasticsearch.snapshots.Snapshot;
-import org.elasticsearch.snapshots.SnapshotsService;
+//CD_ID:4
+//import org.elasticsearch.snapshots.SnapshotsService;
 
 import com.carrotsearch.hppc.ObjectContainer;
 import com.carrotsearch.hppc.cursors.ObjectCursor;
@@ -180,13 +182,13 @@ public class SnapshotsInProgress extends AbstractNamedDiffable<Custom> implement
             failure = in.readOptionalString();
             if (in.getVersion().onOrAfter(VERSION_IN_SNAPSHOT_VERSION)) {
                 version = Version.readVersion(in);
-            } else if (in.getVersion().onOrAfter(SnapshotsService.SHARD_GEN_IN_REPO_DATA_VERSION)) {
+            } else if (in.getVersion().onOrAfter(SHARD_GEN_IN_REPO_DATA_VERSION)) {
                 // If an older master informs us that shard generations are supported we use the minimum shard generation compatible
                 // version. If shard generations are not supported yet we use a placeholder for a version that does not use shard
                 // generations.
-                version = in.readBoolean() ? SnapshotsService.SHARD_GEN_IN_REPO_DATA_VERSION : SnapshotsService.OLD_SNAPSHOT_FORMAT;
+                version = in.readBoolean() ? SHARD_GEN_IN_REPO_DATA_VERSION : OLD_SNAPSHOT_FORMAT;
             } else {
-                version = SnapshotsService.OLD_SNAPSHOT_FORMAT;
+                version = OLD_SNAPSHOT_FORMAT;
             }
         }
 
@@ -480,8 +482,8 @@ public class SnapshotsInProgress extends AbstractNamedDiffable<Custom> implement
             out.writeOptionalString(failure);
             if (out.getVersion().onOrAfter(VERSION_IN_SNAPSHOT_VERSION)) {
                 Version.writeVersion(version, out);
-            } else if (out.getVersion().onOrAfter(SnapshotsService.SHARD_GEN_IN_REPO_DATA_VERSION)) {
-                out.writeBoolean(SnapshotsService.useShardGenerations(version));
+            } else if (out.getVersion().onOrAfter(SHARD_GEN_IN_REPO_DATA_VERSION)) {
+                out.writeBoolean(useShardGenerations(version));
             }
         }
 
@@ -556,7 +558,7 @@ public class SnapshotsInProgress extends AbstractNamedDiffable<Custom> implement
         public ShardSnapshotStatus(StreamInput in) throws IOException {
             nodeId = in.readOptionalString();
             state = ShardState.fromValue(in.readByte());
-            if (SnapshotsService.useShardGenerations(in.getVersion())) {
+            if (useShardGenerations(in.getVersion())) {
                 generation = in.readOptionalString();
             } else {
                 generation = null;
@@ -595,7 +597,7 @@ public class SnapshotsInProgress extends AbstractNamedDiffable<Custom> implement
         public void writeTo(StreamOutput out) throws IOException {
             out.writeOptionalString(nodeId);
             out.writeByte(state.value);
-            if (SnapshotsService.useShardGenerations(out.getVersion())) {
+            if (useShardGenerations(out.getVersion())) {
                 out.writeOptionalString(generation);
             }
             out.writeOptionalString(reason);
@@ -818,5 +820,18 @@ public class SnapshotsInProgress extends AbstractNamedDiffable<Custom> implement
                     throw new IllegalArgumentException("No shard snapshot state for value [" + value + "]");
             }
         }
+    }
+
+    public static final Version SHARD_GEN_IN_REPO_DATA_VERSION = Version.V_4_2_0;
+    public static final Version OLD_SNAPSHOT_FORMAT = Version.V_4_1_0;
+    
+    /**
+     * Checks whether the metadata version supports writing {@link ShardGenerations} to the repository.
+     *
+     * @param repositoryMetaVersion version to check
+     * @return true if version supports {@link ShardGenerations}
+     */
+    public static boolean useShardGenerations(Version repositoryMetaVersion) {
+        return repositoryMetaVersion.onOrAfter(SHARD_GEN_IN_REPO_DATA_VERSION);
     }
 }
