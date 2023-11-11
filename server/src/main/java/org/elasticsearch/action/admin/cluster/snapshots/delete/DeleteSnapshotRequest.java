@@ -19,10 +19,12 @@
 
 package org.elasticsearch.action.admin.cluster.snapshots.delete;
 
+import org.elasticsearch.Version;
 import org.elasticsearch.action.support.master.MasterNodeRequest;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
-import org.elasticsearch.snapshots.SnapshotsService;
+//CD_ID:6
+//import org.elasticsearch.snapshots.SnapshotsService;
 
 import java.io.IOException;
 
@@ -56,10 +58,12 @@ public class DeleteSnapshotRequest extends MasterNodeRequest<DeleteSnapshotReque
         this.snapshots = snapshots;
     }
 
+    public static final Version MULTI_DELETE_VERSION = Version.V_5_1_0;
+    
     public DeleteSnapshotRequest(StreamInput in) throws IOException {
         super(in);
         repository = in.readString();
-        if (in.getVersion().onOrAfter(SnapshotsService.MULTI_DELETE_VERSION)) {
+        if (in.getVersion().onOrAfter(MULTI_DELETE_VERSION)) {
             snapshots = in.readStringArray();
         } else {
             snapshots = new String[] {in.readString()};
@@ -70,7 +74,7 @@ public class DeleteSnapshotRequest extends MasterNodeRequest<DeleteSnapshotReque
     public void writeTo(StreamOutput out) throws IOException {
         super.writeTo(out);
         out.writeString(repository);
-        if (out.getVersion().onOrAfter(SnapshotsService.MULTI_DELETE_VERSION)) {
+        if (out.getVersion().onOrAfter(MULTI_DELETE_VERSION)) {
             out.writeStringArray(snapshots);
         } else {
             if (snapshots.length != 1) {
