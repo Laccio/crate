@@ -40,7 +40,8 @@ import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentParser;
 import org.elasticsearch.snapshots.SnapshotId;
 import org.elasticsearch.snapshots.SnapshotState;
-import org.elasticsearch.snapshots.SnapshotsService;
+//CD_ID:5
+//import org.elasticsearch.snapshots.SnapshotsService;
 import org.jetbrains.annotations.Nullable;
 
 import io.crate.server.xcontent.XContentParserUtils;
@@ -488,8 +489,8 @@ public final class RepositoryData {
         builder.startObject();
         // write the snapshots list
         builder.startArray(SNAPSHOTS);
-        final boolean shouldWriteIndexGens = SnapshotsService.useIndexGenerations(repoMetaVersion);
-        final boolean shouldWriteShardGens = SnapshotsService.useShardGenerations(repoMetaVersion);
+        final boolean shouldWriteIndexGens = useIndexGenerations(repoMetaVersion);
+        final boolean shouldWriteShardGens = useShardGenerations(repoMetaVersion);
         for (final SnapshotId snapshot : getSnapshotIds()) {
             builder.startObject();
             builder.field(NAME, snapshot.getName());
@@ -537,11 +538,11 @@ public final class RepositoryData {
         }
         builder.endObject();
         if (shouldWriteIndexGens) {
-            builder.field(MIN_VERSION, SnapshotsService.INDEX_GEN_IN_REPO_DATA_VERSION.toString());
+            builder.field(MIN_VERSION, INDEX_GEN_IN_REPO_DATA_VERSION.toString());
             builder.field(INDEX_METADATA_IDENTIFIERS, indexMetaDataGenerations.identifiers);
         } else if (shouldWriteShardGens) {
             // Add min version field to make it impossible for older ES versions to deserialize this object
-            builder.field(MIN_VERSION, SnapshotsService.SHARD_GEN_IN_REPO_DATA_VERSION.toString());
+            builder.field(MIN_VERSION, SHARD_GEN_IN_REPO_DATA_VERSION.toString());
         }
         builder.endObject();
         return builder;
@@ -586,7 +587,7 @@ public final class RepositoryData {
                 case MIN_VERSION:
                     XContentParserUtils.ensureExpectedToken(XContentParser.Token.VALUE_STRING, parser.nextToken(), parser);
                     final Version version = Version.fromString(parser.text());
-                    assert SnapshotsService.useShardGenerations(version);
+                    assert useShardGenerations(version);
                     break;
                 default:
                     XContentParserUtils.throwUnknownField(field, parser.getTokenLocation());
@@ -781,5 +782,28 @@ public final class RepositoryData {
             }
         }
         return uuid;
+    }
+
+    public static final Version INDEX_GEN_IN_REPO_DATA_VERSION = Version.V_5_2_0;
+    public static final Version SHARD_GEN_IN_REPO_DATA_VERSION = Version.V_4_2_0;
+
+    /**
+     * Checks whether the metadata version supports writing {@link ShardGenerations} to the repository.
+     *
+     * @param repositoryMetaVersion version to check
+     * @return true if version supports {@link ShardGenerations}
+     */
+    public static boolean useIndexGenerations(Version repositoryMetaVersion) {
+        return repositoryMetaVersion.onOrAfter(INDEX_GEN_IN_REPO_DATA_VERSION);
+    }
+
+    /**
+     * Checks whether the metadata version supports writing {@link ShardGenerations} to the repository.
+     *
+     * @param repositoryMetaVersion version to check
+     * @return true if version supports {@link ShardGenerations}
+     */
+    public static boolean useShardGenerations(Version repositoryMetaVersion) {
+        return repositoryMetaVersion.onOrAfter(SHARD_GEN_IN_REPO_DATA_VERSION);
     }
 }
