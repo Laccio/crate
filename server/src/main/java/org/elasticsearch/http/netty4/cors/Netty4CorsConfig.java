@@ -52,18 +52,18 @@ public final class Netty4CorsConfig {
     private final Map<CharSequence, Callable<?>> preflightHeaders;
     private final boolean shortCircuit;
 
-    Netty4CorsConfig(final Netty4CorsConfigBuilder builder) {
-        origins = builder.origins.map(s -> new LinkedHashSet<>(s));
-        pattern = builder.pattern;
-        anyOrigin = builder.anyOrigin;
-        enabled = builder.enabled;
-        allowCredentials = builder.allowCredentials;
-        maxAge = builder.maxAge;
-        allowedRequestMethods = builder.requestMethods;
-        allowedRequestHeaders = builder.requestHeaders;
-        allowNullOrigin = builder.allowNullOrigin;
-        preflightHeaders = builder.preflightHeaders;
-        shortCircuit = builder.shortCircuit;
+    Netty4CorsConfig(final INetty4CorsConfig builder) {
+        origins = builder.getOrigins().map(s -> new LinkedHashSet<>(s));
+        pattern = builder.getPattern();
+        anyOrigin = builder.getAnyOrigin();
+        enabled = builder.getEnabled();
+        allowCredentials = builder.getAllowCredentials();
+        maxAge = builder.getMaxAge();
+        allowedRequestMethods = builder.getAllowedRequestMethods();
+        allowedRequestHeaders = builder.getAllowedRequestHeaders();
+        allowNullOrigin = builder.getAllowNullOrigin();
+        preflightHeaders = builder.getPreflightHeaders();
+        shortCircuit = builder.getShortCircuit();
     }
 
     /**

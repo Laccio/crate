@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
  * This class was lifted from the Netty project:
  *  https://github.com/netty/netty
  */
-public final class Netty4CorsConfigBuilder {
+public final class Netty4CorsConfigBuilder implements INetty4CorsConfig {
 
     /**
      * Creates a Builder instance with it's origin set to '*'.
@@ -352,6 +352,61 @@ public final class Netty4CorsConfigBuilder {
         public Date call() throws Exception {
             return new Date();
         }
+    }
+
+    @Override
+    public Optional<Set<String>> getOrigins() {
+        return origins;
+    }
+
+    @Override
+    public Optional<Pattern> getPattern() {
+        return pattern;
+    }
+
+    @Override
+    public boolean getAnyOrigin() {
+        return anyOrigin;
+    }
+
+    @Override
+    public boolean getEnabled() {
+        return enabled;
+    }
+
+    @Override
+    public boolean getAllowCredentials() {
+        return allowCredentials;
+    }
+
+    @Override
+    public long getMaxAge() {
+        return maxAge;
+    }
+
+    @Override
+    public Set<HttpMethod> getAllowedRequestMethods() {
+        return requestMethods;
+    }
+
+    @Override
+    public Set<String> getAllowedRequestHeaders() {
+        return requestHeaders;
+    }
+
+    @Override
+    public boolean getAllowNullOrigin() {
+        return allowNullOrigin;
+    }
+
+    @Override
+    public Map<CharSequence, Callable<?>> getPreflightHeaders() {
+        return preflightHeaders;
+    }
+
+    @Override
+    public boolean getShortCircuit() {
+        return shortCircuit;
     }
 
 }
