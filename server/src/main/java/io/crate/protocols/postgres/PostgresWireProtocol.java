@@ -26,6 +26,7 @@ import static io.crate.protocols.postgres.FormatCodes.getFormatCode;
 import static io.crate.protocols.postgres.Messages.sendReadyForQuery;
 
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -46,6 +47,7 @@ import javax.net.ssl.SSLSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.Version;
+import org.elasticsearch.common.network.InetAddresses;
 import org.elasticsearch.http.netty4.Netty4HttpServerTransport;
 import org.jetbrains.annotations.Nullable;
 
@@ -406,10 +408,20 @@ public class PostgresWireProtocol {
         properties = readStartupMessage(buffer);
         initAuthentication(channel);
     }
+    public static InetAddress getRemoteAddress(Channel channel) {
+        if (channel.remoteAddress() instanceof InetSocketAddress) {
+            return ((InetSocketAddress) channel.remoteAddress()).getAddress();
+        }
+        // In certain cases the channel is an EmbeddedChannel (e.g. in tests)
+        // and this type of channel has an EmbeddedSocketAddress instance as remoteAddress
+        // which does not have an address.
+        // An embedded socket address is handled like a local connection via loopback.
+        return InetAddresses.forString("127.0.0.1");
+    }
 
     private void initAuthentication(Channel channel) {
         String userName = properties.getProperty("user");
-        InetAddress address = Netty4HttpServerTransport.getRemoteAddress(channel);
+        InetAddress address = getRemoteAddress(channel);
 
         SSLSession sslSession = getSession(channel);
         ConnectionProperties connProperties = new ConnectionProperties(address, Protocol.POSTGRES, sslSession);

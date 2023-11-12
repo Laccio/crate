@@ -22,11 +22,13 @@
 package org.elasticsearch.transport.netty4;
 
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 
 import javax.security.sasl.AuthenticationException;
 
 import org.elasticsearch.common.network.CloseableChannel;
-import org.elasticsearch.http.netty4.Netty4HttpServerTransport;
+import org.elasticsearch.common.network.InetAddresses;
+//import org.elasticsearch.http.netty4.Netty4HttpServerTransport;
 
 import io.crate.auth.Authentication;
 import io.crate.auth.Protocol;
@@ -47,6 +49,17 @@ public class HostBasedAuthHandler extends ChannelInboundHandlerAdapter {
         this.authentication = authentication;
     }
 
+    public static InetAddress getRemoteAddress(Channel channel) {
+        if (channel.remoteAddress() instanceof InetSocketAddress) {
+            return ((InetSocketAddress) channel.remoteAddress()).getAddress();
+        }
+        // In certain cases the channel is an EmbeddedChannel (e.g. in tests)
+        // and this type of channel has an EmbeddedSocketAddress instance as remoteAddress
+        // which does not have an address.
+        // An embedded socket address is handled like a local connection via loopback.
+        return InetAddresses.forString("127.0.0.1");
+    }
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (authError != null) {
@@ -57,7 +70,7 @@ public class HostBasedAuthHandler extends ChannelInboundHandlerAdapter {
         }
 
         Channel channel = ctx.channel();
-        InetAddress remoteAddress = Netty4HttpServerTransport.getRemoteAddress(channel);
+        InetAddress remoteAddress = getRemoteAddress(channel);
         ConnectionProperties connectionProperties = new ConnectionProperties(
             remoteAddress,
             Protocol.TRANSPORT,

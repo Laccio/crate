@@ -46,7 +46,7 @@ import static org.elasticsearch.http.HttpTransportSettings.SETTING_HTTP_TCP_REUS
 import static org.elasticsearch.http.HttpTransportSettings.SETTING_HTTP_TCP_SEND_BUFFER_SIZE;
 import static org.elasticsearch.http.HttpTransportSettings.SETTING_PIPELINING_MAX_EVENTS;
 import static org.elasticsearch.http.netty4.cors.Netty4CorsHandler.ANY_ORIGIN;
-import static org.elasticsearch.node.Node.NODE_NAME_SETTING;
+//import static org.elasticsearch.node.Node.NODE_NAME_SETTING;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -135,6 +135,8 @@ public class Netty4HttpServerTransport extends AbstractLifecycleComponent implem
     private static final ByteSizeValue MTU = new ByteSizeValue(Long.parseLong(System.getProperty("es.net.mtu", "1500")));
 
     private static final String SETTING_KEY_HTTP_NETTY_MAX_COMPOSITE_BUFFER_COMPONENTS = "http.netty.max_composite_buffer_components";
+
+    public static final Setting<String> NODE_NAME_SETTING = Setting.simpleString("node.name", Property.NodeScope);
 
     public static Setting<Integer> SETTING_HTTP_NETTY_MAX_COMPOSITE_BUFFER_COMPONENTS =
         new Setting<>(SETTING_KEY_HTTP_NETTY_MAX_COMPOSITE_BUFFER_COMPONENTS, (s) -> {
