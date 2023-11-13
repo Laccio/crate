@@ -611,8 +611,7 @@ public class ElasticsearchException extends RuntimeException implements ToXConte
                 org.elasticsearch.index.snapshots.IndexShardRestoreException::new, 5, UNKNOWN_VERSION_ADDED),
         INDEX_CLOSED_EXCEPTION(org.elasticsearch.indices.IndexClosedException.class,
                 org.elasticsearch.indices.IndexClosedException::new, 6, UNKNOWN_VERSION_ADDED),
-        BIND_HTTP_EXCEPTION(org.elasticsearch.http.BindHttpException.class,
-                org.elasticsearch.http.BindHttpException::new, 7, UNKNOWN_VERSION_ADDED),
+        //BIND_HTTP_EXCEPTION(org.elasticsearch.http.BindHttpException.class, org.elasticsearch.http.BindHttpException::new, 7, UNKNOWN_VERSION_ADDED),
         // 8 was ReduceSearchPhaseException
         NODE_CLOSED_EXCEPTION(org.elasticsearch.node.NodeClosedException.class,
                 org.elasticsearch.node.NodeClosedException::new, 9, UNKNOWN_VERSION_ADDED),
@@ -714,7 +713,7 @@ public class ElasticsearchException extends RuntimeException implements ToXConte
             UNKNOWN_VERSION_ADDED),
         INDEX_SHARD_NOT_RECOVERING_EXCEPTION(org.elasticsearch.index.shard.IndexShardNotRecoveringException.class,
                 org.elasticsearch.index.shard.IndexShardNotRecoveringException::new, 66, UNKNOWN_VERSION_ADDED),
-        HTTP_EXCEPTION(org.elasticsearch.http.HttpException.class, org.elasticsearch.http.HttpException::new, 67, UNKNOWN_VERSION_ADDED),
+        //HTTP_EXCEPTION(org.elasticsearch.http.HttpException.class, org.elasticsearch.http.HttpException::new, 67, UNKNOWN_VERSION_ADDED),
         ELASTICSEARCH_EXCEPTION(org.elasticsearch.ElasticsearchException.class,
                 org.elasticsearch.ElasticsearchException::new, 68, UNKNOWN_VERSION_ADDED),
         SNAPSHOT_MISSING_EXCEPTION(org.elasticsearch.snapshots.SnapshotMissingException.class,
