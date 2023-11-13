@@ -89,6 +89,7 @@ import org.elasticsearch.discovery.HandshakingTransportAddressConnector;
 import org.elasticsearch.discovery.PeerFinder;
 import org.elasticsearch.discovery.SeedHostsProvider;
 import org.elasticsearch.discovery.SeedHostsResolver;
+import org.elasticsearch.gateway.ICoordinator;
 import org.elasticsearch.monitor.NodeHealthService;
 import org.elasticsearch.monitor.StatusInfo;
 import org.elasticsearch.threadpool.Scheduler;
@@ -100,7 +101,7 @@ import org.jetbrains.annotations.Nullable;
 import io.crate.common.unit.TimeValue;
 import io.crate.server.xcontent.XContentHelper;
 
-public class Coordinator extends AbstractLifecycleComponent implements Discovery {
+public class Coordinator extends AbstractLifecycleComponent implements Discovery, ICoordinator {
 
     private static final Logger LOGGER = LogManager.getLogger(Coordinator.class);
 

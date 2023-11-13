@@ -48,7 +48,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.Version;
 import org.elasticsearch.common.network.InetAddresses;
-import org.elasticsearch.http.netty4.Netty4HttpServerTransport;
+//import org.elasticsearch.http.netty4.Netty4HttpServerTransport;
 import org.jetbrains.annotations.Nullable;
 
 import io.crate.action.sql.DescribeResult;
@@ -408,6 +408,7 @@ public class PostgresWireProtocol {
         properties = readStartupMessage(buffer);
         initAuthentication(channel);
     }
+
     public static InetAddress getRemoteAddress(Channel channel) {
         if (channel.remoteAddress() instanceof InetSocketAddress) {
             return ((InetSocketAddress) channel.remoteAddress()).getAddress();
