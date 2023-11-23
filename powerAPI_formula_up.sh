@@ -1,0 +1,20 @@
+# Run the docker command to start the container
+docker run -d --name smartwatts-formula --rm -t \
+  --net=host \
+  -e POWERAPI_VERBOSE=true \
+  -e POWERAPI_STREAM=true \
+  -e POWERAPI_CPU_BASE_FREQ=2600 \
+  -e POWERAPI_CPU_ERROR_THRESHOLD=2.0 \
+  -e POWERAPI_DISABLE_DRAM_FORMULA=true \
+  -e POWERAPI_SENSOR_REPORTS_FREQUENCY=1000 \
+  -e POWERAPI_INPUT_PULLER_MODEL=HWPCReport \
+  -e POWERAPI_INPUT_PULLER_TYPE=mongodb \
+  -e POWERAPI_INPUT_PULLER_URI=mongodb://127.0.0.1 \
+  -e POWERAPI_INPUT_PULLER_DB=test \
+  -e POWERAPI_INPUT_PULLER_COLLECTION=prep \
+  -e POWERAPI_OUTPUT_PUSHER_POWER_MODEL=PowerReport \
+  -e POWERAPI_OUTPUT_PUSHER_POWER_TYPE=influxdb \
+  -e POWERAPI_OUTPUT_PUSHER_POWER_URI=127.0.0.1 \
+  -e POWERAPI_OUTPUT_PUSHER_POWER_PORT=8086 \
+  -e POWERAPI_OUTPUT_PUSHER_POWER_DB=power_consumption2 \
+  powerapi/smartwatts-formula

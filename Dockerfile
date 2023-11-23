@@ -11,4 +11,4 @@ COPY . /build/
 RUN mvn clean install -DskipTests=true
 
 # Run the jar file
-ENTRYPOINT ["mvn", "clean", "verify", "-pl", "server"]
+ENTRYPOINT ["mvn", "verify", "-pl", "server"]
